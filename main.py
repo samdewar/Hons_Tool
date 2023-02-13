@@ -47,16 +47,23 @@ def start_gui():
         return
     def Experiment_AR():
 
-        ar = AutoReg(temps,300).fit()
+        ar = AutoReg(temps,3).fit()
 
-        print(ar.data.endog)
-        print(ar.data.orig_endog)
+
+        #print(ar.data.endog)
+       #print(ar.data.orig_endog)
         file=open("test_finished.csv",'a')
+        #print(ar.get_prediction())
 
+        #print(ar._get_prediction_index(0,900))
+        #print(ar.predict(i))
         for i in range(0,len(ar.data.orig_endog)):
+            print(ar.predict(i,i))
+
             file.write(str(ar.data.orig_endog[i]))
             file.write(",")
-            file.write(str(ar.data.endog[i]))
+            file.write(str(ar.predict(i,i)))
+
             file.write("\n")
 
         return
