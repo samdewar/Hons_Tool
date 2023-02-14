@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from statsmodels.tsa.ar_model import AutoReg
+import sklearn as sk
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.impute import KNNImputer
 import datetime
@@ -79,10 +80,20 @@ def start_gui():
         indexes=[]
         knn_temps=[]
         for i in range(0, len(temps)):
-            indexes.append(i)
-            knn_temps.append([temps[i]])
-        knn.fit(knn_temps, indexes)
+            indexes.append([i])
+            #knn_temps.append([temps[i]])
+        #knn.fit(knn_temps, indexes)
+        knn.fit(indexes,temps)
+        output=knn.predict(indexes)
 
+        file=open("KNN_OUTPUT.csv",'w')
+        for i in range(0,len(output)):
+            file.write(str(temps[i]))
+            file.write(",")
+            file.write(str(output[i]))
+            file.write("\n")
+        #mse = sk.mean_squared_error()
+        file.close()
         return
     def Experiment_SWP(): #consider change
         return
