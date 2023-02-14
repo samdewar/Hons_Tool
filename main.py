@@ -23,20 +23,18 @@ def start_gui():
         global raw_data
         global data
         global temps
+        global humids
+        humids=[]
         temps=[]
         raw_data = pd.read_csv("output.csv")
 
         temp=raw_data['Temp']
-
+        humid=raw_data['Humid']
 
         days=[]
         for i in range(0,len(raw_data)):
-            #day=raw_data.at[i,'Day'].split("/")
-            #t=raw_data.at[i,'Time'].split(":")
             temps.append(int(temp[i]))
-            #days.append(datetime.datetime(int(day[2]),int(day[1]),int(day[0]),int(t[0]),int(t[1]))) #or something
-
-            print(i)
+            humids.append(int(humid[i]))
 
         #dt=datetime.datetime(raw_data['Day'],raw_data['Time'])
         data ={'Date-Time':days,'Temp':temp}
@@ -47,29 +45,44 @@ def start_gui():
         return
     def Experiment_AR():
 
-        ar = AutoReg(temps,3).fit()
+        ar = AutoReg(temps,10).fit()
+        output=ar.predict(0,len(ar.data.orig_endog))
 
-
-        #print(ar.data.endog)
-       #print(ar.data.orig_endog)
-        file=open("test_finished.csv",'a')
-        #print(ar.get_prediction())
-
-        #print(ar._get_prediction_index(0,900))
-        #print(ar.predict(i))
-        for i in range(0,len(ar.data.orig_endog)):
-            print(ar.predict(i,i))
-
+        # The following is purely output, data cleaning has already accured by this point
+        file=open("AR_OUTPUT.csv",'w')
+        for i in range(0,len(ar.data.orig_endog)-1):
+            print(ar.data.orig_endog[i]," ",output[i])
             file.write(str(ar.data.orig_endog[i]))
             file.write(",")
-            file.write(str(ar.predict(i,i)))
-
+            file.write(str(output[i]))
             file.write("\n")
-
+        file.close()
         return
     def Experiment_ARX():
+        arx = AutoReg(temps,10, exog=humids).fit()
+        output = arx.predict(0, len(arx.data.orig_endog)-1)
+
+        #The following is purely output, data cleaning has already accured by this point
+        file=open("ARX_OUTPUT.csv",'w')
+        for i in range(0,len(arx.data.orig_endog)-1):
+            print(arx.data.orig_endog[i], " ", output[i])
+            file.write(str(arx.data.orig_endog[i]))
+            file.write(",")
+            file.write(str(output[i]))
+            file.write("\n")
+        file.close()
         return
     def Experiment_KNN():
+        knn=KNeighborsRegressor()
+        #alt_temps=temps.reshape(-1,1)
+        #temps.reshape(-1,1)
+        indexes=[]
+        knn_temps=[]
+        for i in range(0, len(temps)):
+            indexes.append(i)
+            knn_temps.append([temps[i]])
+        knn.fit(knn_temps, indexes)
+
         return
     def Experiment_SWP(): #consider change
         return
