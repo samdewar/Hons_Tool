@@ -44,6 +44,29 @@ def start_gui():
 
         print("Read File: ",filepath.get())
         return
+
+    def Read_File_MV():
+        global raw_data
+        global data
+        global temps
+        temps=[]
+        raw_data = pd.read_csv("output.csv")
+
+        temp=raw_data['Temp']
+        days=[]
+        for i in range(0,len(raw_data)):
+            try:
+                temps.append(int(temp[i]))
+            except:
+                temps.append(int('nan'))
+
+        #dt=datetime.datetime(raw_data['Day'],raw_data['Time'])
+        data ={'Date-Time':days,'Temp':temp}
+        data2 = sm.datasets.sunspots.load_pandas().data['SUNACTIVITY']
+
+
+        print("Read File: ",filepath.get())
+        return
     def Experiment_AR():
 
         ar = AutoReg(temps,10).fit()
@@ -98,6 +121,27 @@ def start_gui():
     def Experiment_SWP(): #consider change
         return
     def Experiment_KNNI():
+        knn = KNeighborsRegressor()
+        # alt_temps=temps.reshape(-1,1)
+        # temps.reshape(-1,1)
+        indexes = []
+        knn_temps = []
+        for i in range(0, len(temps)):
+            indexes.append([i])
+            # knn_temps.append([temps[i]])
+        # knn.fit(knn_temps, indexes)
+        knn.fit(indexes, temps)
+        output = knn.predict(indexes)
+
+        file = open("KNN_OUTPUT.csv", 'w')
+        for i in range(0, len(output)):
+            file.write(str(temps[i]))
+            file.write(",")
+            file.write(str(output[i]))
+            file.write("\n")
+        # mse = sk.mean_squared_error()
+        file.close()
+        return
         return
     def Experiment_WKNNI():
         return
@@ -129,6 +173,8 @@ def start_gui():
 
     btn = Button(win, text="Read File", width=20, height=3, command=Read_File)
     btn.place(x=0, y=20)
+    btn = Button(win, text="Read File\n(With MVs)", width=20, height=3, command=Read_File_MV)
+    btn.place(x=0, y=80)
 
     win.mainloop()  # running the loop that works as a trigger
 
