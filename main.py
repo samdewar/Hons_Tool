@@ -58,7 +58,7 @@ def start_gui():
             try:
                 temps.append(int(temp[i]))
             except:
-                temps.append(int('nan'))
+                temps.append(np.nan)
 
         #dt=datetime.datetime(raw_data['Day'],raw_data['Time'])
         data ={'Date-Time':days,'Temp':temp}
@@ -121,27 +121,19 @@ def start_gui():
     def Experiment_SWP(): #consider change
         return
     def Experiment_KNNI():
-        knn = KNeighborsRegressor()
-        # alt_temps=temps.reshape(-1,1)
-        # temps.reshape(-1,1)
+        knni = KNNImputer()
+
         indexes = []
         knn_temps = []
         for i in range(0, len(temps)):
             indexes.append([i])
-            # knn_temps.append([temps[i]])
+            knn_temps.append([temps[i]])
         # knn.fit(knn_temps, indexes)
-        knn.fit(indexes, temps)
-        output = knn.predict(indexes)
+        knni.fit(indexes, temps)
 
-        file = open("KNN_OUTPUT.csv", 'w')
-        for i in range(0, len(output)):
-            file.write(str(temps[i]))
-            file.write(",")
-            file.write(str(output[i]))
-            file.write("\n")
-        # mse = sk.mean_squared_error()
-        file.close()
-        return
+        output = knni.predict(indexes)
+
+
         return
     def Experiment_WKNNI():
         return
