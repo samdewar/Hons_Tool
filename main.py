@@ -138,15 +138,17 @@ def start_gui():
         return
     def Experiment_WKNNI():
         return
-    def Experiment_Expect_Max():
+    def Experiment_Expect_Max(): #Defunct
         array=[]
         MVs=[]
         for i in range(0, len(temps)):
             if(temps[i]>=0 or temps[i]<=0):
-                array.append([i,temps[i]])
+                array.append([temps[i], i])
             else:
                 MVs.append(i)
-        EM=GaussianMixture(n_components=2, random_state=0).fit(array)
+
+        array=np.array([[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]])
+        EM=GaussianMixture(n_components=2, random_state=0).fit(array, y=None)
         EM.means_
         return
 
