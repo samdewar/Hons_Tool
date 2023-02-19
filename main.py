@@ -10,6 +10,7 @@ from statsmodels.tsa.ar_model import AutoReg
 import sklearn as sk
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.impute import KNNImputer
+from sklearn.mixture import GaussianMixture
 import datetime
 #import autoregression
 
@@ -138,6 +139,15 @@ def start_gui():
     def Experiment_WKNNI():
         return
     def Experiment_Expect_Max():
+        array=[]
+        MVs=[]
+        for i in range(0, len(temps)):
+            if(temps[i]>=0 or temps[i]<=0):
+                array.append([i,temps[i]])
+            else:
+                MVs.append(i)
+        EM=GaussianMixture(n_components=2, random_state=0).fit(array)
+        EM.means_
         return
 
     def func():  # function of the button
