@@ -120,6 +120,21 @@ def start_gui():
         file.close()
         return
     def Experiment_SWP(): #consider change
+
+        k=5 #temp?
+        for i in range(2*k+1, len(temps)):
+            n=69#temp
+            sig_w=0.0
+            sig_w_x
+            for j in range(i,2*k+1): #i or 0?
+                w=1/abs(temp[i]-temp[i-j])
+                sig_w=sig_w+w
+                sig_w_x=sig_w*temp[i-j]
+                #st_dev=
+        x=sig_w_x/sig_w
+        #t=#t-distribution
+        #perc
+        #PCI=temp[i+1]+(perc*st_dev*math.sqrt(1-(1/2*k)))
         return
     def Experiment_KNNI():
         knni = KNNImputer()
