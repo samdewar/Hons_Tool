@@ -1,4 +1,5 @@
 import csv
+import math
 import statistics
 import tkinter.messagebox
 from tkinter import *
@@ -123,23 +124,40 @@ def start_gui():
         return
     def Experiment_SWP(): #consider change
 
-        k=5 #temp?
-        for i in range(2*k+1, len(temps)):
-            #n=69#temp
-            sig_w=0.0
-            sig_w_x
-            window=[]
-            for j in range(i-2*k+1,i): #i or 0?
-                w=1/abs(temps[i]-temps[i-j])
-                sig_w=sig_w+w
-                sig_w_x=sig_w*temps[i-j]
-                window.append[temps[i-j]]
+        k=14 #temp?
+        arr=[]
+        arr=temps.copy()
+        from scipy.spatial import distance
+        for i in range(2*k+1, len(arr)):
 
+            sig_w=0.0
+            sig_w_x=0.0
+            window=[]
+            for j in range(i-(2*k),i): #i or 0?
+                #w=1/abs(arr[i]-arr[i-j])
+                w=1/distance.euclidean((i,arr[i]),(i-j,arr[i-j]))
+                #w=1/(math.dist((i,arr[i]),(i-j,arr[i-j])))
+                sig_w=sig_w+w
+                sig_w_x=sig_w_x+(w*arr[i-j])
+                window.append(arr[i-j])
+            #print(i)
             st_dev=statistics.stdev(window)
             x=sig_w_x/sig_w
+            print(x,"=",sig_w_x,"/",sig_w)
             #t=#t-distribution
-            t.ppf(q=0.01,df=2*k-1)
+
+            PCI=x+(t.ppf(q=0.01,df=2*k-1)*st_dev*math.sqrt(abs(1-(1/2*k))))
+            #print(PCI)
             #PCI=temp[i+1]+(perc*st_dev*math.sqrt(1-(1/2*k)))
+            if(abs(arr[i])<abs(PCI)):
+                arr[i]=x
+
+        file=open("SWP_OUPUT.csv", 'w')
+        for i in range(0,len(arr)):
+            file.write(str(temps[i]))
+            file.write(",")
+            file.write(str(arr[i]))
+            file.write("\n")
         return
     def Experiment_KNNI():
         knni = KNNImputer()
