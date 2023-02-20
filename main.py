@@ -1,4 +1,5 @@
 import csv
+import statistics
 import tkinter.messagebox
 from tkinter import *
 #import pandas
@@ -11,6 +12,7 @@ import sklearn as sk
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.impute import KNNImputer
 from sklearn.mixture import GaussianMixture
+from scipy.stats import t
 import datetime
 #import autoregression
 
@@ -123,18 +125,21 @@ def start_gui():
 
         k=5 #temp?
         for i in range(2*k+1, len(temps)):
-            n=69#temp
+            #n=69#temp
             sig_w=0.0
             sig_w_x
-            for j in range(i,2*k+1): #i or 0?
-                w=1/abs(temp[i]-temp[i-j])
+            window=[]
+            for j in range(i-2*k+1,i): #i or 0?
+                w=1/abs(temps[i]-temps[i-j])
                 sig_w=sig_w+w
-                sig_w_x=sig_w*temp[i-j]
-                #st_dev=
-        x=sig_w_x/sig_w
-        #t=#t-distribution
-        #perc
-        #PCI=temp[i+1]+(perc*st_dev*math.sqrt(1-(1/2*k)))
+                sig_w_x=sig_w*temps[i-j]
+                window.append[temps[i-j]]
+
+            st_dev=statistics.stdev(window)
+            x=sig_w_x/sig_w
+            #t=#t-distribution
+            t.ppf(q=0.01,df=2*k-1)
+            #PCI=temp[i+1]+(perc*st_dev*math.sqrt(1-(1/2*k)))
         return
     def Experiment_KNNI():
         knni = KNNImputer()
