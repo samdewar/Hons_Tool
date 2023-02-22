@@ -73,7 +73,8 @@ def start_gui():
         return
     def Experiment_AR():
 
-        ar = AutoReg(temps,10).fit()
+
+        ar = AutoReg(temps,10, missing='drop').fit()
         output=ar.predict(0,len(ar.data.orig_endog))
 
         # The following is purely output, data cleaning has already accured by this point
@@ -87,7 +88,7 @@ def start_gui():
         file.close()
         return
     def Experiment_ARX():
-        arx = AutoReg(temps,10, exog=humids).fit()
+        arx = AutoReg(temps,10, exog=humids, missing='drop').fit()
         output = arx.predict(0, len(arx.data.orig_endog)-1)
 
         #The following is purely output, data cleaning has already accured by this point
@@ -122,6 +123,29 @@ def start_gui():
         #mse = sk.mean_squared_error()
         file.close()
         return
+    def Experiment_WKNN():
+        knn=KNeighborsRegressor(weights='distance')
+        #alt_temps=temps.reshape(-1,1)
+        #temps.reshape(-1,1)
+        indexes=[]
+        knn_temps=[]
+        for i in range(0, len(temps)):
+            indexes.append([i])
+            #knn_temps.append([temps[i]])
+        #knn.fit(knn_temps, indexes)
+        knn.fit(indexes,temps)
+        output=knn.predict(indexes)
+
+        file=open("KNN_OUTPUT.csv",'w')
+        for i in range(0,len(output)):
+            file.write(str(temps[i]))
+            file.write(",")
+            file.write(str(output[i]))
+            file.write("\n")
+        #mse = sk.mean_squared_error()
+        file.close()
+        return
+
     def Experiment_SWP(): #consider change
 
         k=14 #temp?
@@ -159,8 +183,21 @@ def start_gui():
             file.write(str(arr[i]))
             file.write("\n")
         return
+
+
     def Experiment_KNNI():
-        knni = KNNImputer()
+        knni = KNNImputer(weights='uniform')
+        indexes = []
+        knn_temps = []
+        for i in range(0, len(temps)):
+            indexes.append([i])
+            knn_temps.append([temps[i]])
+        # knn.fit(knn_temps, indexes)
+        knni.fit(indexes, temps)
+        output = knni.fit_transform(knn_temps)
+        return
+    def Experiment_WKNNI():
+        knni = KNNImputer(weights='distance')
 
         indexes = []
         knn_temps = []
@@ -170,11 +207,7 @@ def start_gui():
         # knn.fit(knn_temps, indexes)
         knni.fit(indexes, temps)
 
-        output = knni.predict(indexes)
-
-
-        return
-    def Experiment_WKNNI():
+        output = knni.fit_transform(knn_temps)
         return
     def Experiment_Expect_Max(): #Defunct
         array=[]
