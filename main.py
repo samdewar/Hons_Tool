@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from statsmodels.tsa.ar_model import AutoReg
 import sklearn as sk
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.neighbors import KNeighborsRegressor, NearestNeighbors
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.impute import KNNImputer
 from sklearn.mixture import GaussianMixture
 from scipy.stats import t
@@ -102,17 +103,28 @@ def start_gui():
         file.close()
         return
     def Experiment_KNN():
-        knn=KNeighborsRegressor()
-        #alt_temps=temps.reshape(-1,1)
-        #temps.reshape(-1,1)
-        indexes=[]
-        knn_temps=[]
+        # knn=KNeighborsRegressor() #not doing knn regression
+        # #alt_temps=temps.reshape(-1,1)
+        # #temps.reshape(-1,1)
+        # indexes=[]
+        # knn_temps=[]
+        # for i in range(0, len(endog_var)):
+        #     indexes.append([i])
+        #     #knn_temps.append([temps[i]])
+        # #knn.fit(knn_temps, indexes)
+        # knn.fit(indexes, endog_var)
+        # output=knn.predict(indexes)
+
+        indexes = []
+        knn_var = []
         for i in range(0, len(endog_var)):
             indexes.append([i])
-            #knn_temps.append([temps[i]])
-        #knn.fit(knn_temps, indexes)
-        knn.fit(indexes, endog_var)
-        output=knn.predict(indexes)
+            knn_var.append([endog_var[i]])
+
+        knn=KNeighborsClassifier()
+        knn.fit(indexes,knn_var)
+        output=knn.predict(knn_var)
+
 
         file=open("KNN_OUTPUT.csv",'w')
         for i in range(0,len(output)):
