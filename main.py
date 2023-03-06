@@ -27,10 +27,10 @@ def start_gui():
     def Read_File():
         global raw_data
         global data
-        global temps
-        global humids
-        humids=[]
-        temps=[]
+        global endog_var
+        global exog_var
+        exog_var=[]
+        endog_var=[]
         raw_data = pd.read_csv("output.csv")
 
         temp=raw_data['Temp']
@@ -38,8 +38,8 @@ def start_gui():
 
         days=[]
         for i in range(0,len(raw_data)):
-            temps.append(int(temp[i]))
-            humids.append(int(humid[i]))
+            endog_var.append(int(temp[i]))
+            exog_var.append(int(humid[i]))
 
         #dt=datetime.datetime(raw_data['Day'],raw_data['Time'])
         data ={'Date-Time':days,'Temp':temp}
@@ -52,17 +52,17 @@ def start_gui():
     def Read_File_MV():
         global raw_data
         global data
-        global temps
-        temps=[]
+        global endog_var
+        endog_var=[]
         raw_data = pd.read_csv("output.csv")
 
         temp=raw_data['Temp']
         days=[]
         for i in range(0,len(raw_data)):
             try:
-                temps.append(int(temp[i]))
+                endog_var.append(int(temp[i]))
             except:
-                temps.append(np.nan)
+                endog_var.append(np.nan)
 
         #dt=datetime.datetime(raw_data['Day'],raw_data['Time'])
         data ={'Date-Time':days,'Temp':temp}
@@ -74,7 +74,7 @@ def start_gui():
     def Experiment_AR():
 
 
-        ar = AutoReg(temps,10, missing='drop').fit()
+        ar = AutoReg(endog_var, 10, missing='drop').fit()
         output=ar.predict(0,len(ar.data.orig_endog))
 
         # The following is purely output, data cleaning has already accured by this point
@@ -88,7 +88,7 @@ def start_gui():
         file.close()
         return
     def Experiment_ARX():
-        arx = AutoReg(temps,10, exog=humids, missing='drop').fit()
+        arx = AutoReg(endog_var, 10, exog=exog_var, missing='drop').fit()
         output = arx.predict(0, len(arx.data.orig_endog)-1)
 
         #The following is purely output, data cleaning has already accured by this point
@@ -107,16 +107,16 @@ def start_gui():
         #temps.reshape(-1,1)
         indexes=[]
         knn_temps=[]
-        for i in range(0, len(temps)):
+        for i in range(0, len(endog_var)):
             indexes.append([i])
             #knn_temps.append([temps[i]])
         #knn.fit(knn_temps, indexes)
-        knn.fit(indexes,temps)
+        knn.fit(indexes, endog_var)
         output=knn.predict(indexes)
 
         file=open("KNN_OUTPUT.csv",'w')
         for i in range(0,len(output)):
-            file.write(str(temps[i]))
+            file.write(str(endog_var[i]))
             file.write(",")
             file.write(str(output[i]))
             file.write("\n")
@@ -129,16 +129,16 @@ def start_gui():
         #temps.reshape(-1,1)
         indexes=[]
         knn_temps=[]
-        for i in range(0, len(temps)):
+        for i in range(0, len(endog_var)):
             indexes.append([i])
             #knn_temps.append([temps[i]])
         #knn.fit(knn_temps, indexes)
-        knn.fit(indexes,temps)
+        knn.fit(indexes, endog_var)
         output=knn.predict(indexes)
 
         file=open("KNN_OUTPUT.csv",'w')
         for i in range(0,len(output)):
-            file.write(str(temps[i]))
+            file.write(str(endog_var[i]))
             file.write(",")
             file.write(str(output[i]))
             file.write("\n")
@@ -150,35 +150,29 @@ def start_gui():
 
         k=14 #temp?
         arr=[]
-        arr=temps.copy()
+        arr=endog_var.copy()
         from scipy.spatial import distance
         for i in range(2*k+1, len(arr)):
 
             sig_w=0.0
             sig_w_x=0.0
             window=[]
-            for j in range(i-(2*k),i): #i or 0?
-                #w=1/abs(arr[i]-arr[i-j])
+            for j in range(i-(2*k),i):
                 w=1/distance.euclidean((i,arr[i]),(i-j,arr[i-j]))
-                #w=1/(math.dist((i,arr[i]),(i-j,arr[i-j])))
                 sig_w=sig_w+w
                 sig_w_x=sig_w_x+(w*arr[i-j])
                 window.append(arr[i-j])
-            #print(i)
-            st_dev=statistics.stdev(window)
             x=sig_w_x/sig_w
-            print(x,"=",sig_w_x,"/",sig_w)
-            #t=#t-distribution
+
+            st_dev=statistics.stdev(window)
 
             PCI=x+(t.ppf(q=0.01,df=2*k-1)*st_dev*math.sqrt(abs(1-(1/2*k))))
-            #print(PCI)
-            #PCI=temp[i+1]+(perc*st_dev*math.sqrt(1-(1/2*k)))
             if(abs(arr[i])<abs(PCI)):
                 arr[i]=x
 
         file=open("SWP_OUPUT.csv", 'w')
         for i in range(0,len(arr)):
-            file.write(str(temps[i]))
+            file.write(str(endog_var[i]))
             file.write(",")
             file.write(str(arr[i]))
             file.write("\n")
@@ -189,11 +183,11 @@ def start_gui():
         knni = KNNImputer(weights='uniform')
         indexes = []
         knn_temps = []
-        for i in range(0, len(temps)):
+        for i in range(0, len(endog_var)):
             indexes.append([i])
-            knn_temps.append([temps[i]])
+            knn_temps.append([endog_var[i]])
         # knn.fit(knn_temps, indexes)
-        knni.fit(indexes, temps)
+        knni.fit(indexes, endog_var)
         output = knni.fit_transform(knn_temps)
         return
     def Experiment_WKNNI():
@@ -201,20 +195,20 @@ def start_gui():
 
         indexes = []
         knn_temps = []
-        for i in range(0, len(temps)):
+        for i in range(0, len(endog_var)):
             indexes.append([i])
-            knn_temps.append([temps[i]])
+            knn_temps.append([endog_var[i]])
         # knn.fit(knn_temps, indexes)
-        knni.fit(indexes, temps)
+        knni.fit(indexes, endog_var)
 
         output = knni.fit_transform(knn_temps)
         return
     def Experiment_Expect_Max(): #Defunct
         array=[]
         MVs=[]
-        for i in range(0, len(temps)):
-            if(temps[i]>=0 or temps[i]<=0):
-                array.append([temps[i], i])
+        for i in range(0, len(endog_var)):
+            if(endog_var[i]>=0 or endog_var[i]<=0):
+                array.append([endog_var[i], i])
             else:
                 MVs.append(i)
 
