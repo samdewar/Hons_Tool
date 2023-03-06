@@ -89,7 +89,7 @@ def start_gui():
         return
     def Experiment_ARX():
         arx = AutoReg(endog_var, 10, exog=exog_var, missing='drop').fit()
-        output = arx.predict(0, len(arx.data.orig_endog)-1)
+        output = arx.predict(0, len(arx.data.orig_endog))
 
         #The following is purely output, data cleaning has already accured by this point
         file=open("ARX_OUTPUT.csv",'w')
@@ -182,26 +182,25 @@ def start_gui():
     def Experiment_KNNI():
         knni = KNNImputer(weights='uniform')
         indexes = []
-        knn_temps = []
+        knn_var = []
         for i in range(0, len(endog_var)):
             indexes.append([i])
-            knn_temps.append([endog_var[i]])
+            knn_var.append([endog_var[i]])
         # knn.fit(knn_temps, indexes)
         knni.fit(indexes, endog_var)
-        output = knni.fit_transform(knn_temps)
+        output = knni.fit_transform(knn_var)
         return
     def Experiment_WKNNI():
-        knni = KNNImputer(weights='distance')
+        wknni = KNNImputer(weights='distance')
 
         indexes = []
         knn_temps = []
         for i in range(0, len(endog_var)):
             indexes.append([i])
             knn_temps.append([endog_var[i]])
-        # knn.fit(knn_temps, indexes)
-        knni.fit(indexes, endog_var)
+        wknni.fit(indexes, endog_var)
 
-        output = knni.fit_transform(knn_temps)
+        output = wknni.fit_transform(knn_temps)
         return
     def Experiment_Expect_Max(): #Defunct
         array=[]
