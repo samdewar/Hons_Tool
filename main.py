@@ -32,7 +32,7 @@ def start_gui():
         global exog_var
         exog_var=[]
         endog_var=[]
-        raw_data = pd.read_csv("MV4.csv")
+        raw_data = pd.read_csv("OT1.csv")
 
         temp=raw_data['Column 3']
         humid=raw_data['Column 4']
