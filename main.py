@@ -32,10 +32,10 @@ def start_gui():
         global exog_var
         exog_var=[]
         endog_var=[]
-        raw_data = pd.read_csv("output.csv")
+        raw_data = pd.read_csv("MV4.csv")
 
-        temp=raw_data['Temp']
-        humid=raw_data['Humid']
+        temp=raw_data['Column 3']
+        humid=raw_data['Column 4']
 
         days=[]
         for i in range(0,len(raw_data)):
@@ -55,9 +55,9 @@ def start_gui():
         global data
         global endog_var
         endog_var=[]
-        raw_data = pd.read_csv("output.csv")
+        raw_data = pd.read_csv("MV4.csv")
 
-        temp=raw_data['Temp']
+        temp=raw_data['Column 3']
         days=[]
         for i in range(0,len(raw_data)):
             try:
@@ -90,7 +90,7 @@ def start_gui():
         return
     def Experiment_ARX():
         arx = AutoReg(endog_var, 10, exog=exog_var, missing='drop').fit()
-        output = arx.predict(0, len(arx.data.orig_endog))
+        output = arx.predict(0, len(arx.data.orig_endog)-1)
 
         #The following is purely output, data cleaning has already accured by this point
         file=open("ARX_OUTPUT.csv",'w')
@@ -148,7 +148,7 @@ def start_gui():
         knn.fit(indexes, endog_var)
         output=knn.predict(indexes)
 
-        file=open("KNN_OUTPUT.csv",'w')
+        file=open("WKNNI_OUTPUT.csv",'w')
         for i in range(0,len(output)):
             file.write(str(endog_var[i]))
             file.write(",")
