@@ -102,6 +102,19 @@ def start_gui():
             file.write("\n")
         file.close()
         return
+
+    def Experiment_AR_Imputation():
+        arr = endog_var
+        MVs = []
+        for i in range(0, len(arr)):
+            if (arr[i] == np.NaN):
+                MVs.append(i)
+
+        for i in range(0, len(MVs)):
+            ar = AutoReg(arr[0:MVs[i]], 10, ).fit()
+            arr = ar.predict[MVs[i]]
+
+        return
     def Experiment_KNN():
         # knn=KNeighborsRegressor() #not doing knn regression
         # #alt_temps=temps.reshape(-1,1)
@@ -243,7 +256,7 @@ def start_gui():
     btn.place(x=200, y=260)
     btn = Button(win, text="WKNNI", width=20, height=3, command=Experiment_WKNNI)
     btn.place(x=200, y=320)
-    btn = Button(win, text="Maximum Likelihood\nImputiation", width=20, height=3, command=Experiment_Expect_Max)
+    btn = Button(win, text="Maximum Likelihood\nImputiation", width=20, height=3, command=Experiment_AR_Imputation)
     btn.place(x=200, y=380)
 
     filepath = Entry()
