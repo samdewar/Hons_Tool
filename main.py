@@ -3,6 +3,7 @@ import math
 import statistics
 import tkinter.messagebox
 from tkinter import *
+from timeit import default_timer
 #import pandas
 import pandas as pd
 import numpy as np
@@ -55,9 +56,9 @@ def start_gui():
         global data
         global endog_var
         endog_var=[]
-        raw_data = pd.read_csv("MV4.csv")
+        raw_data = pd.read_csv("CALTRANS\\MV1.csv")
 
-        temp=raw_data['Column 3']
+        temp=raw_data['Column 11']
         days=[]
         for i in range(0,len(raw_data)):
             try:
@@ -107,13 +108,28 @@ def start_gui():
         arr = endog_var
         MVs = []
         for i in range(0, len(arr)):
-            if (arr[i] == np.NaN):
+            try:
+                temp=0
+                temp=int(arr[i])+1
+            except:
                 MVs.append(i)
 
+        start = default_timer()
+        imputes=[]
         for i in range(0, len(MVs)):
-            ar = AutoReg(arr[0:MVs[i]], 10, ).fit()
-            arr = ar.predict[MVs[i]]
+            #print(i)
 
+            ar = AutoReg(arr[0:MVs[i]],1).fit()
+            arr[MVs[i]] = ar.forecast()[0]
+
+            #imputes.append(ar.forecast())
+
+        print(default_timer()-start)
+        file=open("AR_IMPUTE_OUTPUT.csv", 'w')
+        for i in range(0, len(arr)):
+            file.write(str(arr[i]))
+            file.write('\n')
+        file.close()
         return
     def Experiment_KNN():
         # knn=KNeighborsRegressor() #not doing knn regression
@@ -134,9 +150,12 @@ def start_gui():
             indexes.append([i])
             knn_var.append([endog_var[i]])
 
+
         knn=KNeighborsClassifier()
+        start = default_timer()
         knn.fit(indexes,knn_var)
         output=knn.predict(knn_var)
+        print(default_timer-start)
 
 
         file=open("KNN_OUTPUT.csv",'w')
@@ -158,9 +177,10 @@ def start_gui():
             indexes.append([i])
             #knn_temps.append([temps[i]])
         #knn.fit(knn_temps, indexes)
+        start = default_timer
         knn.fit(indexes, endog_var)
         output=knn.predict(indexes)
-
+        print(default_timer-start)
         file=open("WKNNI_OUTPUT.csv",'w')
         for i in range(0,len(output)):
             file.write(str(endog_var[i]))
@@ -177,6 +197,7 @@ def start_gui():
         arr=[]
         arr=endog_var.copy()
         from scipy.spatial import distance
+        start = default_timer()
         for i in range(2*k+1, len(arr)):
 
             sig_w=0.0
@@ -194,13 +215,15 @@ def start_gui():
             PCI=x+(t.ppf(q=0.01,df=2*k-1)*st_dev*math.sqrt(abs(1-(1/2*k))))
             if(abs(arr[i])<abs(PCI)):
                 arr[i]=x
-
+        end=default_timer()-start
+        print(end)
         file=open("SWP_OUPUT.csv", 'w')
         for i in range(0,len(arr)):
             file.write(str(endog_var[i]))
             file.write(",")
             file.write(str(arr[i]))
             file.write("\n")
+        file.close()
         return
 
 
@@ -212,8 +235,17 @@ def start_gui():
             indexes.append([i])
             knn_var.append([endog_var[i]])
         # knn.fit(knn_temps, indexes)
+        start = default_timer()
         knni.fit(indexes, endog_var)
         output = knni.fit_transform(knn_var)
+        print(default_timer()-start)
+        file = open("KNNI_OUTPUT.csv",'w')
+        for i in range(0,len(output)):
+            #file.write(str(endog_var[i]))
+            #file.write(",")
+            file.write(output[i])
+            file.write("\n")
+        file.close()
         return
     def Experiment_WKNNI():
         wknni = KNNImputer(weights='distance')
@@ -223,9 +255,15 @@ def start_gui():
         for i in range(0, len(endog_var)):
             indexes.append([i])
             knn_temps.append([endog_var[i]])
-        wknni.fit(indexes, endog_var)
 
+        start = default_timer()
+        wknni.fit(indexes, endog_var)
         output = wknni.fit_transform(knn_temps)
+        print(default_timer()-start)
+        file=open("WKNNI_OUPUT.csv", 'w')
+        for i in range(0,len(output)):
+            file.write(output[i])
+        file.close()
         return
     def Experiment_Expect_Max(): #Defunct
         array=[]
@@ -256,7 +294,7 @@ def start_gui():
     btn.place(x=200, y=260)
     btn = Button(win, text="WKNNI", width=20, height=3, command=Experiment_WKNNI)
     btn.place(x=200, y=320)
-    btn = Button(win, text="Maximum Likelihood\nImputiation", width=20, height=3, command=Experiment_AR_Imputation)
+    btn = Button(win, text="Autoregression Based\nImputiation", width=20, height=3, command=Experiment_AR_Imputation)
     btn.place(x=200, y=380)
 
     filepath = Entry()
