@@ -5,9 +5,12 @@ import pandas as pd
 filepath=input("Filepath:")
 probability=np.double(input("Probability of injection:"))
 raw_data = pd.read_csv(filepath)
-data=raw_data['Column 3']
-mode=int(input("MV(1) or Outlier(2)"))
 
+mode=int(input("MV(1) or Outlier(2)"))
+if(mode==1):
+    data = raw_data['Column 10']
+elif(mode==2):
+    data = raw_data['Column 2']
 
 
 dirty_data=[]
@@ -25,7 +28,10 @@ for i in range(0,len(raw_data)):
         dirty_data.append(new_data)
         print("injection", i)
 
-raw_data['Column 3']=dirty_data
+if(mode==1):
+    raw_data['Column 10'] = dirty_data
+elif(mode==2):
+    raw_data['Column 3']=dirty_data
 
 
 #file=open(input("Output:"))
