@@ -33,7 +33,7 @@ def start_gui():
         global exog_var
         exog_var=[]
         endog_var=[]
-        raw_data = pd.read_csv("OT1.csv")
+        raw_data = pd.read_csv("OT4.csv")
 
         temp=raw_data['Column 3']
         humid=raw_data['Column 4']
@@ -56,7 +56,7 @@ def start_gui():
         global data
         global endog_var
         endog_var=[]
-        raw_data = pd.read_csv("CALTRANS\\MV1.csv")
+        raw_data = pd.read_csv("CALTRANS\\MV4.csv")
 
         temp=raw_data['Column 11']
         days=[]
@@ -76,13 +76,16 @@ def start_gui():
     def Experiment_AR():
 
 
+        start=default_timer()
         ar = AutoReg(endog_var, 10, missing='drop').fit()
-        output=ar.predict(0,len(ar.data.orig_endog))
 
-        # The following is purely output, data cleaning has already accured by this point
+        output=ar.predict(0,len(ar.data.orig_endog))
+        print(default_timer()-start)
+
+        # The following is purely output, data cleaning has already finished by this point
         file=open("AR_OUTPUT.csv",'w')
         for i in range(0,len(ar.data.orig_endog)-1):
-            print(ar.data.orig_endog[i]," ",output[i])
+            #print(ar.data.orig_endog[i]," ",output[i])
             file.write(str(ar.data.orig_endog[i]))
             file.write(",")
             file.write(str(output[i]))
@@ -90,13 +93,14 @@ def start_gui():
         file.close()
         return
     def Experiment_ARX():
+        start=default_timer()
         arx = AutoReg(endog_var, 10, exog=exog_var, missing='drop').fit()
         output = arx.predict(0, len(arx.data.orig_endog)-1)
-
+        print(default_timer()-start)
         #The following is purely output, data cleaning has already accured by this point
         file=open("ARX_OUTPUT.csv",'w')
         for i in range(0,len(arx.data.orig_endog)-1):
-            print(arx.data.orig_endog[i], " ", output[i])
+            #print(arx.data.orig_endog[i], " ", output[i])
             file.write(str(arx.data.orig_endog[i]))
             file.write(",")
             file.write(str(output[i]))
@@ -155,7 +159,7 @@ def start_gui():
         start = default_timer()
         knn.fit(indexes,knn_var)
         output=knn.predict(knn_var)
-        print(default_timer-start)
+        print(default_timer()-start)
 
 
         file=open("KNN_OUTPUT.csv",'w')
@@ -243,7 +247,7 @@ def start_gui():
         for i in range(0,len(output)):
             #file.write(str(endog_var[i]))
             #file.write(",")
-            file.write(output[i])
+            file.write(str(output[i][0]))
             file.write("\n")
         file.close()
         return
@@ -262,7 +266,7 @@ def start_gui():
         print(default_timer()-start)
         file=open("WKNNI_OUPUT.csv", 'w')
         for i in range(0,len(output)):
-            file.write(output[i])
+            file.write(str(output[i][0]))
         file.close()
         return
     def Experiment_Expect_Max(): #Defunct
