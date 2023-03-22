@@ -21,6 +21,8 @@ import datetime
 
 global filepath
 #global raw_data
+# global endog_var
+# endog_var=[]
 
 def start_gui():
     win = Tk()  # creating the main window and storing the window object in 'win'
@@ -199,6 +201,9 @@ def start_gui():
         file.close()
         return
 
+
+
+
     def Experiment_SWP(): #consider change
 
         k=14 #temp?
@@ -255,35 +260,76 @@ def start_gui():
             file.write("\n")
         file.close()
         return
-    def Experiment_WKNNI():
-        arr = endog_var
-        MVs = []
-        for i in range(0, len(arr)):
-            try:
-                temp = 0
-                temp = int(arr[i]) + 1
-            except:
-                MVs.append(i)
+    # def Experiment_WKNNI():
+    #     arr = endog_var
+    #     MVs = []
+    #     for i in range(0, len(arr)):
+    #         try:
+    #             temp = 0
+    #             temp = int(arr[i]) + 1
+    #         except:
+    #             MVs.append(i)
+    #
+    #     start = default_timer()
+    #     imputes = []
+    #     for i in range(0, len(MVs)):
+    #         # print(i)
+    #
+    #         ar = AutoReg(arr[0:MVs[i]], exog=exog_var[0:MVs[i]], lags=1).fit()
+    #         arr[MVs[i]] = ar.forecast()[0]
+    #
+    #
+    #         # imputes.append(ar.forecast())
+    #
+    #     print(default_timer() - start)
+    #     file = open("ARX_IMPUTE_OUTPUT.csv", 'w')
+    #     for i in range(0, len(arr)):
+    #         file.write(str(arr[i]))
+    #         file.write('\n')
+    #     file.close()
+    #     return
 
+
+
+
+    def Experiment_SWPI(): #consider change
+        k=5 #temp?
+        arr=[]
+
+        arr=endog_var.copy()
+        from scipy.spatial import distance
         start = default_timer()
-        imputes = []
-        for i in range(0, len(MVs)):
-            # print(i)
+        for i in range(2*k+1, len(arr)):
+            try:
+                temp=int(arr[i])+1
+            except:
+                sig_w=0.0
+                sig_w_x=0.0
+                window=[]
+                for j in range(i-(2*k),i):
+                    #w=1/distance.euclidean((i,arr[i]),(i-j,arr[i-j]))
+                    #w=1/((i-arr[i])^2+(i-j-arr[i-j]))^2
+                    w=1/i-j
+                    sig_w=sig_w+w
+                    sig_w_x=sig_w_x+(w*arr[i-j])
+                    window.append(arr[i-j])
+                x=sig_w_x/sig_w
 
-            ar = AutoReg(arr[0:MVs[i]], exog=exog_var[0:MVs[i]], lags=1).fit()
-            arr[MVs[i]] = ar.forecast()[0]
+                st_dev=statistics.stdev(window)
 
+                PCI=x+(t.ppf(q=0.01,df=2*k-1)*st_dev*math.sqrt(abs(1-(1/2*k))))
 
-            # imputes.append(ar.forecast())
-
-        print(default_timer() - start)
-        file = open("ARX_IMPUTE_OUTPUT.csv", 'w')
-        for i in range(0, len(arr)):
+                arr[i]=x
+        end=default_timer()-start
+        print(end)
+        file=open("SWPI_OUPUT.csv", 'w')
+        for i in range(0,len(arr)):
+            file.write(str(endog_var[i]))
+            file.write(",")
             file.write(str(arr[i]))
-            file.write('\n')
+            file.write("\n")
         file.close()
         return
-
     def Experiment_Expect_Max(): #Defunct
         array=[]
         MVs=[]
@@ -298,8 +344,10 @@ def start_gui():
         EM.means_
         return
 
-    def func():  # function of the button
-        tkinter.messagebox.showinfo("Greetings", "Hello! Welcome to PythonGeeks.")
+    btn = Button(win, text="Read File", width=20, height=3, command=Read_File)
+    btn.place(x=0, y=20)
+    btn = Button(win, text="Read File\n(With MVs)", width=20, height=3, command=Read_File_MV)
+    btn.place(x=0, y=80)
 
     btn = Button(win, text="Autoregression", width=20, height=3, command=Experiment_AR)
     btn.place(x=200, y=20)
@@ -311,7 +359,7 @@ def start_gui():
     btn.place(x=200, y=200)
     btn = Button(win, text="KNNI", width=20, height=3, command=Experiment_KNNI)
     btn.place(x=200, y=260)
-    btn = Button(win, text="WKNNI", width=20, height=3, command=Experiment_WKNNI)
+    btn = Button(win, text="SWP Based\nImputation", width=20, height=3, command=Experiment_SWPI)
     btn.place(x=200, y=320)
     btn = Button(win, text="Autoregression Based\nImputiation", width=20, height=3, command=Experiment_AR_Imputation)
     btn.place(x=200, y=380)
@@ -321,10 +369,7 @@ def start_gui():
     filepath.focus_set()
     filepath.place(x=0, y=200)
 
-    btn = Button(win, text="Read File", width=20, height=3, command=Read_File)
-    btn.place(x=0, y=20)
-    btn = Button(win, text="Read File\n(With MVs)", width=20, height=3, command=Read_File_MV)
-    btn.place(x=0, y=80)
+
 
     win.mainloop()  # running the loop that works as a trigger
 
