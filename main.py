@@ -55,12 +55,16 @@ def start_gui():
         global raw_data
         global data
         global endog_var
+        global exog_var
+        exog_var=[]
         endog_var=[]
         raw_data = pd.read_csv("CALTRANS\\MV1.csv")
 
         temp=raw_data['Column 11']
+        temp2=raw_data['Column 12']
         days=[]
         for i in range(0,len(raw_data)):
+            exog_var.append(temp2[i])
             try:
                 endog_var.append(int(temp[i]))
             except:
@@ -252,24 +256,34 @@ def start_gui():
         file.close()
         return
     def Experiment_WKNNI():
-        wknni = KNNImputer(weights='distance')
-
-        indexes = []
-        knn_temps = []
-        for i in range(0, len(endog_var)):
-            indexes.append([i])
-            knn_temps.append([endog_var[i]])
+        arr = endog_var
+        MVs = []
+        for i in range(0, len(arr)):
+            try:
+                temp = 0
+                temp = int(arr[i]) + 1
+            except:
+                MVs.append(i)
 
         start = default_timer()
-        wknni.fit(indexes, endog_var)
-        output = wknni.fit_transform(knn_temps)
-        print(default_timer()-start)
-        file=open("WKNNI_OUTPUT.csv", 'w')
-        for i in range(0,len(output)):
-            file.write(str(output[i][0]))
-            file.write("\n")
+        imputes = []
+        for i in range(0, len(MVs)):
+            # print(i)
+
+            ar = AutoReg(arr[0:MVs[i]], exog=exog_var[0:MVs[i]], lags=1).fit()
+            arr[MVs[i]] = ar.forecast()[0]
+
+
+            # imputes.append(ar.forecast())
+
+        print(default_timer() - start)
+        file = open("ARX_IMPUTE_OUTPUT.csv", 'w')
+        for i in range(0, len(arr)):
+            file.write(str(arr[i]))
+            file.write('\n')
         file.close()
         return
+
     def Experiment_Expect_Max(): #Defunct
         array=[]
         MVs=[]
