@@ -10,7 +10,7 @@ mode=int(input("MV(1) or Outlier(2)"))
 if(mode==1):
     data = raw_data['Column 10']
 elif(mode==2):
-    data = raw_data['Column 2']
+    data = raw_data['Column 3']
 
 
 dirty_data=[]
