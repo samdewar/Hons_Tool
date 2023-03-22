@@ -56,7 +56,7 @@ def start_gui():
         global data
         global endog_var
         endog_var=[]
-        raw_data = pd.read_csv("CALTRANS\\MV4.csv")
+        raw_data = pd.read_csv("CALTRANS\\MV1.csv")
 
         temp=raw_data['Column 11']
         days=[]
@@ -264,9 +264,10 @@ def start_gui():
         wknni.fit(indexes, endog_var)
         output = wknni.fit_transform(knn_temps)
         print(default_timer()-start)
-        file=open("WKNNI_OUPUT.csv", 'w')
+        file=open("WKNNI_OUTPUT.csv", 'w')
         for i in range(0,len(output)):
             file.write(str(output[i][0]))
+            file.write("\n")
         file.close()
         return
     def Experiment_Expect_Max(): #Defunct
