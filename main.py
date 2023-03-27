@@ -12,8 +12,9 @@ import statsmodels.api as sm
 from statsmodels.tsa.ar_model import AutoReg
 import sklearn as sk
 from sklearn.neighbors import KNeighborsRegressor, NearestNeighbors
+from sklearn.experimental import enable_iterative_imputer
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.impute import KNNImputer
+from sklearn.impute import KNNImputer, IterativeImputer
 from sklearn.mixture import GaussianMixture
 from scipy.stats import t
 import datetime
@@ -60,7 +61,7 @@ def start_gui():
         global exog_var
         exog_var=[]
         endog_var=[]
-        raw_data = pd.read_csv("CALTRANS\\MV1.csv")
+        raw_data = pd.read_csv("CALTRANS\\MV1-half.csv")
 
         temp=raw_data['Column 11']
         temp2=raw_data['Column 12']
@@ -141,6 +142,29 @@ def start_gui():
             file.write('\n')
         file.close()
         return
+
+    def Experiment_IterativeImputer():
+        imputer=IterativeImputer()
+        indexes=[]
+        arr=[]
+        for i in range(0, len(endog_var)):
+            indexes.append([i])
+            arr.append([endog_var[i]])
+        output=imputer.fit(arr)
+        return
+
+    def Experiment_KNNREG():
+        knn=KNeighborsRegressor() #not doing knn regression
+        #alt_temps=temps.reshape(-1,1)
+        #temps.reshape(-1,1)
+        indexes=[]
+        knn_temps=[]
+        for i in range(0, len(endog_var)):
+            indexes.append([i])
+            #knn_temps.append([temps[i]])
+        #knn.fit(knn_temps, indexes)
+        knn.fit(indexes, endog_var)
+        output=knn.predict(indexes)
     def Experiment_KNN():
         # knn=KNeighborsRegressor() #not doing knn regression
         # #alt_temps=temps.reshape(-1,1)
@@ -357,7 +381,7 @@ def start_gui():
     btn.place(x=200, y=140)
     btn = Button(win, text="Sliding Window\nProjection", width=20, height=3, command=Experiment_SWP)
     btn.place(x=200, y=200)
-    btn = Button(win, text="KNNI", width=20, height=3, command=Experiment_KNNI)
+    btn = Button(win, text="KNNI", width=20, height=3, command=Experiment_IterativeImputer)
     btn.place(x=200, y=260)
     btn = Button(win, text="SWP Based\nImputation", width=20, height=3, command=Experiment_SWPI)
     btn.place(x=200, y=320)
