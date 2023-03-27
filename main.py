@@ -150,7 +150,8 @@ def start_gui():
         for i in range(0, len(endog_var)):
             indexes.append([i])
             arr.append([endog_var[i]])
-        output=imputer.fit(arr)
+        imputer.fit(arr)
+        output=imputer.transform(arr)
         return
 
     def Experiment_KNNREG():
