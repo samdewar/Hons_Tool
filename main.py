@@ -46,7 +46,7 @@ def start_gui():
         global exog_var
         exog_var=[]
         endog_var=[]
-
+        tkinter.messagebox.showinfo("Time", "Information")
         # raw_data = pd.read_csv("OT4.csv")
         raw_data = pd.read_csv(filepath.get())
         temp=raw_data['Column 3']
@@ -102,12 +102,12 @@ def start_gui():
         ar = AutoReg(endog_var, 10, missing='drop').fit()
 
         output=ar.predict(0,len(ar.data.orig_endog))
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
 
         # The following is purely output, data cleaning has already finished by this point
         file=open("AR_OUTPUT.csv",'w')
         for i in range(0,len(ar.data.orig_endog)-1):
-            #print(ar.data.orig_endog[i]," ",output[i])
+            #tkinter.messagebox.showinfo("Time", ar.data.orig_endog[i]," ",output[i])
             file.write(str(ar.data.orig_endog[i]))
             file.write(",")
             file.write(str(output[i]))
@@ -118,11 +118,11 @@ def start_gui():
         start=default_timer()
         arx = AutoReg(endog_var, 10, exog=exog_var, missing='drop').fit()
         output = arx.predict(0, len(arx.data.orig_endog)-1)
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
         #The following is purely output, data cleaning has already accured by this point
         file=open("ARX_OUTPUT.csv",'w')
         for i in range(0,len(arx.data.orig_endog)-1):
-            #print(arx.data.orig_endog[i], " ", output[i])
+            #tkinter.messagebox.showinfo("Time", arx.data.orig_endog[i], " ", output[i])
             file.write(str(arx.data.orig_endog[i]))
             file.write(",")
             file.write(str(output[i]))
@@ -160,7 +160,7 @@ def start_gui():
         start = default_timer()
         imputes=[]
         for i in range(0, len(MVs)):
-            #print(i)
+            #tkinter.messagebox.showinfo("Time", i)
 
             ar = AutoReg(arr[0:MVs[i]],1).fit()
 
@@ -168,7 +168,7 @@ def start_gui():
 
             #imputes.append(ar.forecast())
 
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
         file=open("AR_IMPUTE_OUTPUT.csv", 'w')
         for i in range(0, len(arr)):
             file.write(str(arr[i]))
@@ -192,7 +192,7 @@ def start_gui():
         imputer.fit(arr)
 
         output=imputer.transform(arr)
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
         file=open("Iterative_Imputer_OUTPUT.csv",'w')
         for i in range (0,len(output)):
             file.write(str(output[i][0]))
@@ -213,7 +213,7 @@ def start_gui():
         start = default_timer()
         knn.fit(indexes,knn_var)
         output=knn.predict(knn_var)
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
 
 
         file=open("KNN_OUTPUT.csv",'w')
@@ -254,7 +254,7 @@ def start_gui():
             if(abs(arr[i])<abs(PCI)):
                 arr[i]=x
         end=default_timer()-start
-        print(end)
+        tkinter.messagebox.showinfo("Time", end)
         file=open("SWP_OUPUT.csv", 'w')
         for i in range(0,len(arr)):
             file.write(str(endog_var[i]))
@@ -276,7 +276,7 @@ def start_gui():
         start = default_timer()
         knni.fit(indexes, endog_var)
         output = knni.fit_transform(knn_var)
-        print(default_timer()-start)
+        tkinter.messagebox.showinfo("Time", default_timer()-start)
         file = open("KNNI_OUTPUT.csv",'w')
         for i in range(0,len(output)):
             #file.write(str(endog_var[i]))
@@ -298,7 +298,7 @@ def start_gui():
     #     start = default_timer()
     #     imputes = []
     #     for i in range(0, len(MVs)):
-    #         # print(i)
+    #         # tkinter.messagebox.showinfo("Time", i)
     #
     #         ar = AutoReg(arr[0:MVs[i]], exog=exog_var[0:MVs[i]], lags=1).fit()
     #         arr[MVs[i]] = ar.forecast()[0]
@@ -306,7 +306,7 @@ def start_gui():
     #
     #         # imputes.append(ar.forecast())
     #
-    #     print(default_timer() - start)
+    #     tkinter.messagebox.showinfo("Time", default_timer() - start)
     #     file = open("ARX_IMPUTE_OUTPUT.csv", 'w')
     #     for i in range(0, len(arr)):
     #         file.write(str(arr[i]))
@@ -343,7 +343,7 @@ def start_gui():
                 #PCI=x+(t.ppf(q=0.01,df=2*k-1)*st_dev*math.sqrt(abs(1-(1/2*k))))
                 arr[i]=x
         end=default_timer()-start
-        print(end)
+        tkinter.messagebox.showinfo("Time", end)
         file=open("SWPI_OUPUT.csv", 'w')
         for i in range(0,len(arr)):
             file.write(str(endog_var[i]))
@@ -356,7 +356,7 @@ def start_gui():
     def Example_Algo():
         start=default_timer()
         time.sleep(100)
-        print(start-default_timer())
+        tkinter.messagebox.showinfo("Time", start-default_timer())
 
 
     btn = Button(win, text="Read File", width=20, height=3, command=Read_File)
